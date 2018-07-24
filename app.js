@@ -205,17 +205,21 @@ app.get('/block/:num', function (req, res) {
 	blockchain.getBlock(num).then(function(block) {
 		res.send(JSON.parse(block));
 	}).catch(function(error) {
-		res.send(error);
+		res.send('{"error":"'+error+'"}');
 	})
 });
 
 app.post('/block', function (req, res) {
 	var body = req.body.body;
-	blockchain.addBlock(new Block(body)).then(function(block) {
+	if (!body)
+		res.send('{"error":"Could not add block. Body was empty"}')
+	else {
+		blockchain.addBlock(new Block(body)).then(function(block) {
 		res.send(block);
-	}).catch(function(error) {
-		res.send(error);
-	})
+		}).catch(function(error) {
+			res.send('{"error":"'+error+'"}');
+		});
+	}
 });
 
 app.listen(8000, function () {
